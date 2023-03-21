@@ -33,36 +33,6 @@ public class MapParser {
     private final BoardFactory boardCreator;
 
     /**
-     * The grid of squares that is being built.
-     */
-    private Square[][] grid;
-
-    /**
-     * The input stream to read from.
-     */
-    InputStream source;
-    /**
-     * The list of lines that is being built.
-     */
-    List<String> lines;
-    /**
-     * The grid of characters that is being built.
-     */
-    char[][] map;
-
-    /**
-     * Initializes a new grid.
-     *
-     * @param width
-     *           The width of the grid.
-     * @param height
-     *          The height of the grid.
-     */
-    public Square[][] newGrid(int width, int height) {
-        return new Square[width][height];
-    }
-
-    /**
      * Creates a new map parser.
      *
      * @param levelFactory
@@ -306,19 +276,19 @@ public class MapParser {
      * @return The level as represented by this text.
      */
     public Level parseMap(String mapName) throws IOException {
-        createStream(mapName);
+        List<String> lines = createStream(mapName);
 
-        createMap(this.lines);
+        char[][] map = createMap(lines);
 
-        int width = this.map.length;
-        int height = this.map[0].length;
+        int width = map.length;
+        int height = map[0].length;
 
         Square[][] grid = new Square[width][height];
         // TODO : remplacer grid par newGrid(width, height)
         List<Ghost> ghosts = new ArrayList<>();
         List<Square> startPositions = new ArrayList<>();
 
-        makeGrid(this.map, width, height, grid, ghosts, startPositions);
+        makeGrid(map, width, height, grid, ghosts, startPositions);
 
         Board board = boardCreator.createBoard(grid);
         return levelCreator.createLevel(board, ghosts, startPositions);
@@ -336,12 +306,12 @@ public class MapParser {
         value = {"OBL_UNSATISFIED_OBLIGATION", "RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"},
         justification = "try with resources always cleans up / false positive in java 11"
     )
-    public void createStream(String mapName) throws IOException {
+    public List<String> createStream(String mapName) throws IOException {
         try (InputStream boardStream = MapParser.class.getResourceAsStream(mapName)) {
             if (boardStream == null) {
                 throw new PacmanConfigurationException("Could not get resource for: " + mapName);
             }
-            createLines(boardStream);
+            return createLines(boardStream);
         }
     }
     /**
@@ -353,14 +323,14 @@ public class MapParser {
      * @throws IOException
      *             when the source could not be read.
      */
-    public void createLines(InputStream source) throws IOException {
+    public List<String> createLines(InputStream source) throws IOException {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(
             source, "UTF-8"))) {
             List<String> lines = new ArrayList<>();
             while (reader.ready()) {
                 lines.add(reader.readLine());
             }
-            this.lines = lines;
+            return lines;
         }
     }
     /**
@@ -373,7 +343,7 @@ public class MapParser {
      * @return The level as represented by the text.
      * @throws PacmanConfigurationException If text lines are not properly formatted.
      */
-    public void createMap(List<String> text) {
+    public char[][] createMap(List<String> text) {
 
         checkMapFormat(text);
 
@@ -386,12 +356,7 @@ public class MapParser {
                 map[x][y] = text.get(y).charAt(x);
             }
         }
-        this.map = map;
-    }
-    public String convertStreamToString(InputStream is) {
-        Scanner s = new Scanner(is).useDelimiter("\\A");
-        String result = s.hasNext() ? s.next() : "";
-        return result;
+        return map;
     }
 }
 
