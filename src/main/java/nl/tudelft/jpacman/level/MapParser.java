@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 import nl.tudelft.jpacman.PacmanConfigurationException;
 import nl.tudelft.jpacman.board.Board;
@@ -35,6 +36,19 @@ public class MapParser {
      * The grid of squares that is being built.
      */
     private Square[][] grid;
+
+    /**
+     * The input stream to read from.
+     */
+    InputStream source;
+    /**
+     * The list of lines that is being built.
+     */
+    List<String> lines;
+    /**
+     * The grid of characters that is being built.
+     */
+    char[][] map;
 
     /**
      * Initializes a new grid.
@@ -292,21 +306,23 @@ public class MapParser {
      * @return The level as represented by this text.
      */
     public Level parseMap(String mapName) throws IOException {
-        InputStream source = createStream(mapName);
+        createStream(mapName);
 
-        List<String> lines = createLines(source);
+        createLines(this.source);
+        System.out.println("boardStream = " + convertStreamToString(this.source));
 
-        char[][] map = createMap(lines);
 
-        int width = map.length;
-        int height = map[0].length;
+        createMap(this.lines);
+
+        int width = this.map.length;
+        int height = this.map[0].length;
 
         Square[][] grid = new Square[width][height];
         // TODO : remplacer grid par newGrid(width, height)
         List<Ghost> ghosts = new ArrayList<>();
         List<Square> startPositions = new ArrayList<>();
 
-        makeGrid(map, width, height, grid, ghosts, startPositions);
+        makeGrid(this.map, width, height, grid, ghosts, startPositions);
 
         Board board = boardCreator.createBoard(grid);
         return levelCreator.createLevel(board, ghosts, startPositions);
@@ -324,12 +340,14 @@ public class MapParser {
         value = {"OBL_UNSATISFIED_OBLIGATION", "RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"},
         justification = "try with resources always cleans up / false positive in java 11"
     )
-    public InputStream createStream(String mapName) throws IOException {
+    public void createStream(String mapName) throws IOException {
         try (InputStream boardStream = MapParser.class.getResourceAsStream(mapName)) {
             if (boardStream == null) {
                 throw new PacmanConfigurationException("Could not get resource for: " + mapName);
             }
-            return boardStream;
+            System.out.println("boardStream = " + convertStreamToString(boardStream));
+            System.out.println("________________________________");
+            this.source = boardStream;
         }
     }
     /**
@@ -341,15 +359,14 @@ public class MapParser {
      * @throws IOException
      *             when the source could not be read.
      */
-    public List<String> createLines(InputStream source) throws IOException {
+    public void createLines(InputStream source) throws IOException {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(
             source, "UTF-8"))) {
             List<String> lines = new ArrayList<>();
-            System.out.println("reader.readline() = " + reader.readLine());
             while (reader.ready()) {
                 lines.add(reader.readLine());
             }
-            return lines;
+            this.lines = lines;
         }
     }
     /**
@@ -362,7 +379,7 @@ public class MapParser {
      * @return The level as represented by the text.
      * @throws PacmanConfigurationException If text lines are not properly formatted.
      */
-    public char[][] createMap(List<String> text) {
+    public void createMap(List<String> text) {
 
         checkMapFormat(text);
 
@@ -375,9 +392,13 @@ public class MapParser {
                 map[x][y] = text.get(y).charAt(x);
             }
         }
-        return map;
+        this.map = map;
     }
-
+    public String convertStreamToString(InputStream is) {
+        Scanner s = new Scanner(is).useDelimiter("\\A");
+        String result = s.hasNext() ? s.next() : "";
+        return result;
+    }
 }
 
 
