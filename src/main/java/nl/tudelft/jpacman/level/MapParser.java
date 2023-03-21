@@ -308,10 +308,6 @@ public class MapParser {
     public Level parseMap(String mapName) throws IOException {
         createStream(mapName);
 
-        createLines(this.source);
-        System.out.println("boardStream = " + convertStreamToString(this.source));
-
-
         createMap(this.lines);
 
         int width = this.map.length;
@@ -345,9 +341,7 @@ public class MapParser {
             if (boardStream == null) {
                 throw new PacmanConfigurationException("Could not get resource for: " + mapName);
             }
-            System.out.println("boardStream = " + convertStreamToString(boardStream));
-            System.out.println("________________________________");
-            this.source = boardStream;
+            createLines(boardStream);
         }
     }
     /**
