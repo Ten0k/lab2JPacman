@@ -39,6 +39,11 @@ public class Player extends Unit {
      */
     private Unit killer;
 
+    // Ajouter attribut private int nbVies
+    // Ajouter méthode getNbVies() pour accéder à la variable nbVies
+    // Ajouter méthode resetNbVies(int nbVies) pour réinitialiser le nombre de vies
+    // Ajouter méthode loseVies() pour décrémenter de 1 le nombre de vies
+
     /**
      * Creates a new player with a score of 0 points.
      *
@@ -48,6 +53,7 @@ public class Player extends Unit {
      *            The sprite to be shown when this player dies.
      */
     protected Player(Map<Direction, Sprite> spriteMap, AnimatedSprite deathAnimation) {
+        //Initialisation du nombre de vies à 3
         this.score = 0;
         this.alive = true;
         this.sprites = spriteMap;

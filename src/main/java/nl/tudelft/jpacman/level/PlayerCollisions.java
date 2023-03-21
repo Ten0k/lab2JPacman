@@ -52,6 +52,8 @@ public class PlayerCollisions implements CollisionMap {
      */
     public void playerVersusGhost(Player player, Ghost ghost) {
         pointCalculator.collidedWithAGhost(player, ghost);
+        // Appeler la méthode loseVies() de la classe Player qui va décrémenter le nombre de vie du joueur
+        // Enregistrer grid dans un fichier grid.txt afin de s'en servir dans une prochaine itération de la méthode makeGrid
         player.setAlive(false);
         player.setKiller(ghost);
     }

@@ -46,6 +46,12 @@ public class MapParser {
 
     private void makeGrid(char[][] map, int width, int height,
                           Square[][] grid, List<Ghost> ghosts, List<Square> startPositions) {
+        // Séparer les cas d'initialisation et de réinitisalisation de la grille
+        // L'initialisation s'effectue avec le code ci-dessous lorsque le jeu est chargé pour la première fois
+        // ou que le joueur a perdu toutes ses vies
+        // La réinitilisation s'effectue lorsque le joueur a perdu une vie mais qu'il lui en reste
+        // A ce moment là, on ne réinitialise que la position des fantômes et du joueur
+        // Pour effectuer la réinitialisation, il faut récupérer la valeur de la grille dans grid.txt
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 char c = map[x][y];
